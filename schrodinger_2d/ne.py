@@ -1,5 +1,3 @@
-# ne.py
-
 import numpy as np
 
 from schrodinger_2d_solver import schrodinger_2d_solver
@@ -7,18 +5,17 @@ from plot_results import plot_wavefunction_results, plot_energy_levels
 
 
 def main():
-    # ------------------------
-    # Constants
-    # ------------------------
+
     eps0 = 8.8541878128e-12
-    eps = 1.244 * eps0 #dielectric constant of solid neon
+    eps = 1.244 * eps0                  # dielectric constant of solid neon
     hbar = 1.0545718e-34
     me = 9.10938356e-31
     e = 1.602e-19
 
-    # ------------------------
+    #-----------------------------------------------------------------------
     # Depth scan setup
-    # ------------------------
+    #-----------------------------------------------------------------------
+
     da = np.linspace(100e-10, 1000e-10, 10)  # 100 Å to 1000 Å
     Egs = np.zeros(10)
     E1s = np.zeros(10)
@@ -28,9 +25,7 @@ def main():
     k = 0  
     d = da[k]
 
-    # ------------------------
-    # Grids
-    # ------------------------
+    # grids
     Nr = 1200
     r_max = 75e-9
     dr = r_max / Nr
@@ -42,12 +37,11 @@ def main():
     Nr = r.size
     Nz = z.size
 
-
     R, Z = np.meshgrid(r, z, indexing="ij") 
 
-    # ------------------------
+    #-----------------------------------------------------------------------
     # Point charge potential Vq
-    # ------------------------
+    #-----------------------------------------------------------------------
 
     two_over = 2.0 / (1.0 + eps / eps0)
     denom = 4.0 * np.pi * eps0
@@ -62,9 +56,10 @@ def main():
         denom * np.sqrt((Z[mask_outside] + d)**2 + R[mask_outside]**2)
     )
 
-    # ------------------------
-    # Dipole potential Vd (not used in final V, but we translate it anyway)
-    # ------------------------
+    #-----------------------------------------------------------------------
+    # Dipole potential Vd 
+    #-----------------------------------------------------------------------
+
     dd = 3e-10
     p = e * dd
     Vd = np.empty_like(R)
@@ -77,9 +72,10 @@ def main():
         4.0 * np.pi * eps0 * ((Z[mask_outside_d] + d)**2 + R[mask_outside_d]**2)**(1.5)
     )
 
-    # ------------------------
+    #-----------------------------------------------------------------------
     # Image charge potential Vim
-    # ------------------------
+    #-----------------------------------------------------------------------
+
     Vim = np.zeros_like(R)
     alpha = -((eps - eps0) / (eps + eps0)) * e**2 / (16.0 * np.pi * eps0)
 
@@ -91,14 +87,16 @@ def main():
     Vim[mask_z_mid] = alpha / 2.3e-10
     Vim[mask_z_gt] = alpha / Z[mask_z_gt]
 
-    # ------------------------
+    #-----------------------------------------------------------------------
     # Total potential V (J)
-    # ------------------------
+    #-----------------------------------------------------------------------
+
     V = Vq + Vim  
 
-    # ------------------------
+    #-----------------------------------------------------------------------
     # Solve Schrödinger equation for m=0 and m=1
-    # ------------------------
+    #-----------------------------------------------------------------------
+
     all_states = []
     all_psi = {}
     
@@ -112,7 +110,7 @@ def main():
         
         print(f"m={m}: E0={E[0]*1000:.1f} meV, E1={E[1]*1000:.1f} meV, E2={E[2]*1000:.1f} meV")
     
-    # Sort all states by energy to get global spectrum
+    # Sort all states by energy 
     all_states_sorted = sorted(all_states)
     
     print(f"\nGlobal energy spectrum (first 6 states):")
@@ -125,8 +123,12 @@ def main():
     
     plot_energy_levels(all_states_sorted[:6])
     
-    ground_m = all_states_sorted[0][1]  # m value of ground state
-    first_excited_m = all_states_sorted[1][1]  # m value of first excited
+    ground_m = all_states_sorted[0][1]  
+    first_excited_m = all_states_sorted[1][1] 
+    
+    #-----------------------------------------------------------------------
+    # Plotting
+    #-----------------------------------------------------------------------
     
     print(f"\nPlotting wavefunctions...")
     print(f"Ground state: m={ground_m}")
