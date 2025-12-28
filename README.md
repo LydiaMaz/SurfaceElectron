@@ -4,7 +4,7 @@ A numerical solver for bound states of an electron above a dielectric surface us
 
 ## Overview
 
-This solver calculates electron states in cylindrical coordinates (r, z) for systems like electrons near surfaces. It handles multiple potential types including point charges and image charges.
+This solver calculates quantum states of electrons above a solid neon surface with point charge and image charge interactions. The system models an electron interacting with both a buried point charge and its electrostatic image in the dielectric neon substrate. The implementation uses DLL-FDM for the radial direction and central differences for the z-direction to handle the cylindrical coordinate singularity.
 
 ## Repository Structure
 
@@ -22,7 +22,7 @@ pip install numpy scipy matplotlib
 
 ## Usage
 
-### Neon Surface Example
+### Neon Surface
 
 ```bash
 cd schrodinger_2d
@@ -35,7 +35,7 @@ This calculates electron states near a neon surface and generates:
 - Wavefunction probability density plots
 
 
-## Results (Neon Example)
+## Results (Neon)
 
 ```
 Global energy spectrum (first 6 states):
