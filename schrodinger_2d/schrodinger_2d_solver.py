@@ -1,14 +1,16 @@
+"""
+schrodinger_2d_solver.py
+2D Schrödinger equation solver using DLL-FDM method (https://arxiv.org/pdf/1512.05826) in cylindrical coordinates.
+Python translation of Ziheng Zhang's Schrodinger_2dsolver.m (WASHU)
+"""
+#-----------------------------------------------------------------------
 import numpy as np
 from scipy.sparse import diags, kron, identity, spdiags, csc_matrix
 from scipy.sparse.linalg import eigsh
+#-----------------------------------------------------------------------
 
 
 def schrodinger_2d_solver(r, z, V, m, n_states=5, tol=1e-8, maxit=3000):
-
-    """
-    Python translation of Ziheng Zhang's Schrodinger_2dsolver.m (WASHU)
-    DLL-FDL scheme (https://arxiv.org/pdf/1512.05826)
-    """
 
     # Physical constants
     hbar = 1.0545718e-34
@@ -33,7 +35,6 @@ def schrodinger_2d_solver(r, z, V, m, n_states=5, tol=1e-8, maxit=3000):
     #-----------------------------------------------------------------------
     # z part: central difference for 2nd deriv.
     #-----------------------------------------------------------------------
-
     factor = hbar**2 / (2.0 * me)
     Zdiag = factor * 2.0 / dz**2
     Zoff = -factor * 1.0 / dz**2
@@ -49,7 +50,6 @@ def schrodinger_2d_solver(r, z, V, m, n_states=5, tol=1e-8, maxit=3000):
     #-----------------------------------------------------------------------
     # r part: DLL-FDM radial op
     #-----------------------------------------------------------------------
-
     coeff = -hbar**2 / (2.0 * me * dr**2)
 
     rdiag = np.zeros(Nr, dtype=float)
@@ -70,7 +70,6 @@ def schrodinger_2d_solver(r, z, V, m, n_states=5, tol=1e-8, maxit=3000):
     #-----------------------------------------------------------------------
     # Total Hamiltonian
     #-----------------------------------------------------------------------
-
     Vvec = V.reshape(Nr * Nz, order="F") 
     V_full = spdiags(Vvec, 0, Nr * Nz, Nr * Nz, format="csc")
 
@@ -85,7 +84,6 @@ def schrodinger_2d_solver(r, z, V, m, n_states=5, tol=1e-8, maxit=3000):
     #-----------------------------------------------------------------------
     # Shift-invert eigensolver
     #-----------------------------------------------------------------------
-
     sigma = float(Vvec.min() / e - 0.1)
 
     E_vals, vecs = eigsh(

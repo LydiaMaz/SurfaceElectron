@@ -1,14 +1,15 @@
-# plot_results.py
-
+"""
+plot_results.py
+Plot the wavefunction results from the 2D Schrödinger solver.
+"""
+#-----------------------------------------------------------------------
 import numpy as np
 import matplotlib.pyplot as plt
+#-----------------------------------------------------------------------
 
 
 def plot_wavefunction_results(r, z, psi, E, Ngrid=900, title_suffix=""):
-    """
-    Plot the wavefunction results from the 2D Schrödinger solver.
-    Added title_suffix parameter to label different m values.
-    """
+
     Nr = r.size
     Nz = z.size
     
@@ -99,9 +100,7 @@ def plot_wavefunction_results(r, z, psi, E, Ngrid=900, title_suffix=""):
 
 
 def plot_energy_levels(states_list):
-    """Plot energy level diagram showing m quantum numbers"""
-    import matplotlib.pyplot as plt
-    
+
     fig, ax = plt.subplots(figsize=(8, 10))
     
     # Group states by m
@@ -117,18 +116,13 @@ def plot_energy_levels(states_list):
         ax.hlines(En*1000, 0.6, 1.0, colors='red', linewidth=3)
         ax.text(1.1, En*1000, f'n={n}', ha='left', va='center', fontsize=10)
     
-    # Labels and formatting
     ax.set_xlim(-0.3, 1.3)
     ax.set_ylabel('Energy (meV)', fontsize=14)
     ax.set_title('Energy Level Diagram', fontsize=16)
-    
-    # Add m labels
     ax.text(0.2, ax.get_ylim()[0] - (ax.get_ylim()[1]-ax.get_ylim()[0])*0.05, 
             'm = 0', ha='center', va='top', fontsize=12, color='blue', fontweight='bold')
     ax.text(0.8, ax.get_ylim()[0] - (ax.get_ylim()[1]-ax.get_ylim()[0])*0.05, 
             'm = 1', ha='center', va='top', fontsize=12, color='red', fontweight='bold')
-    
-    # Remove x-axis ticks
     ax.set_xticks([])
     
     plt.grid(True, alpha=0.3, axis='y')
