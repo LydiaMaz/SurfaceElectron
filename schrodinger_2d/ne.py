@@ -28,7 +28,7 @@ def main():
     E2n = np.zeros(10)
 
     k = 0  
-    d = da[k]
+    d = da[k] # 10nm
 
     # grids
     Nr = 1200
