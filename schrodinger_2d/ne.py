@@ -28,7 +28,7 @@ def main():
     E2n = np.zeros(10)
 
     k = 0  
-    d = da[k] # 10nm
+    d = da[0] # 10nm
 
     # grids
     Nr = 1200
@@ -45,25 +45,25 @@ def main():
     R, Z = np.meshgrid(r, z, indexing="ij") 
 
     #-----------------------------------------------------------------------
-    # Point charge potential Vq
+    # Point charge potential Vp
     #-----------------------------------------------------------------------
     two_over = 2.0 / (1.0 + eps / eps0)
     denom = 4.0 * np.pi * eps0
 
-    Vq = np.empty_like(R)
+    Vp = np.empty_like(R)
 
     mask_inside = (Z <= 0.0)
     mask_outside = ~mask_inside
 
-    Vq[mask_inside] = 0.7 * e
-    Vq[mask_outside] = -e**2 * two_over / (
+    Vp[mask_inside] = 0.7 * e
+    Vp[mask_outside] = -e**2 * two_over / (
         denom * np.sqrt((Z[mask_outside] + d)**2 + R[mask_outside]**2)
     )
 
     #-----------------------------------------------------------------------
     # Dipole potential Vd 
     #-----------------------------------------------------------------------
-    dd = 3e-10
+    dd = 4e-10 
     p = e * dd
     Vd = np.empty_like(R)
 
@@ -71,9 +71,11 @@ def main():
     mask_outside_d = ~mask_inside_d
 
     Vd[mask_inside_d] = 0.7 * e
-    Vd[mask_outside_d] = -e * p * (Z[mask_outside_d] + d) / (
+    Vd[mask_outside_d] = (-e) * p * (Z[mask_outside_d] + d) / (
         4.0 * np.pi * eps0 * ((Z[mask_outside_d] + d)**2 + R[mask_outside_d]**2)**(1.5)
     )
+    eta = 2.0 / (eps + 1.0) # screening from neon
+    Vd *= eta
 
     #-----------------------------------------------------------------------
     # Image charge potential Vim
@@ -89,10 +91,11 @@ def main():
     Vim[mask_z_mid] = alpha / 2.3e-10
     Vim[mask_z_gt] = alpha / Z[mask_z_gt]
 
+
     #-----------------------------------------------------------------------
     # Total potential V (J)
     #-----------------------------------------------------------------------
-    V = Vq + Vim  
+    V = Vd + Vim  
 
     #-----------------------------------------------------------------------
     # Solve Schrödinger equation for m=0 and m=1
@@ -108,7 +111,7 @@ def main():
         for n, En in enumerate(E):
             all_states.append((En, m, n))
         
-        print(f"m={m}: E0={E[0]*1000:.1f} meV, E1={E[1]*1000:.1f} meV, E2={E[2]*1000:.1f} meV")
+        print(f"m={m}: E0={E[0]*1000:.6f} meV, E1={E[1]*1000:.6f} meV, E2={E[2]*1000:.6f} meV")
     
     # Sort all states by energy 
     all_states_sorted = sorted(all_states)
@@ -116,6 +119,10 @@ def main():
     print(f"\nGlobal energy spectrum (first 6 states):")
     for i, (En, m, n) in enumerate(all_states_sorted[:6]):
         print(f"State {i}: E = {En*1000:.1f} meV (m={m}, n={n})")
+    
+    # Energy separation between ground and first excited (μeV)
+    E01_separation = (all_states_sorted[1][0] - all_states_sorted[0][0]) * 1e6  # Convert eV to μeV
+    print(f"\nE01 separation: {E01_separation:.1f} μeV")
     
     Egs[k] = all_states_sorted[0][0]  # Ground state energy
     E1s[k] = all_states_sorted[1][0]  # First excited state
