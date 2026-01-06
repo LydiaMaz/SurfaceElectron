@@ -1,6 +1,6 @@
 """
 ne.py
-Neon surface electron states calculation with point charge and image charge potentials.
+Neon surface electron states calculation with dipole and image charge potentials.
 Python translation of Ziheng Zhang's Ne.m (WASHU)
 """
 #-----------------------------------------------------------------------
@@ -44,21 +44,6 @@ def main():
 
     R, Z = np.meshgrid(r, z, indexing="ij") 
 
-    #-----------------------------------------------------------------------
-    # Point charge potential Vp
-    #-----------------------------------------------------------------------
-    two_over = 2.0 / (1.0 + eps / eps0)
-    denom = 4.0 * np.pi * eps0
-
-    Vp = np.empty_like(R)
-
-    mask_inside = (Z <= 0.0)
-    mask_outside = ~mask_inside
-
-    Vp[mask_inside] = 0.7 * e
-    Vp[mask_outside] = -e**2 * two_over / (
-        denom * np.sqrt((Z[mask_outside] + d)**2 + R[mask_outside]**2)
-    )
 
     #-----------------------------------------------------------------------
     # Dipole potential Vd 
