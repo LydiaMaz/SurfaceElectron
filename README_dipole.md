@@ -1,6 +1,6 @@
 # Dipole Potential Studies
 
-Studies of dipole potentials replacing point charges in neon surface electron calculations.
+Studies of dipole potentials replacing point charge in neon surface electron calculations.
 
 ## Configuration
 - Electric dipole with moment p = e × 4 Å at depth d = 10 nm
@@ -22,10 +22,10 @@ E01 separation: 2377.4 μeV
 
 ## Files
 - `ne.py`: Single dipole calculation
-- `ne_ring_dipoles.py`: Ring of dipoles configuration
+
 
 ## Usage
 ```bash
-python ne.py              # Single dipole
-python ne_ring_dipoles.py  # Ring configuration
+python ne.py              # Vim + Vd
+
 ```
