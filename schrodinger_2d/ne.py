@@ -1,6 +1,6 @@
 """
 ne.py
-Neon surface electron states calculation with point charge and image charge potentials.
+Neon surface electron states calculation with quadrupole and image charge potentials.
 Python translation of Ziheng Zhang's Ne.m (WASHU)
 """
 #-----------------------------------------------------------------------
