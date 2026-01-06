@@ -14,7 +14,7 @@ from plot_results import plot_wavefunction_results, plot_energy_levels
 def main():
 
     eps0 = 8.8541878128e-12
-    eps = 1.244 * eps0                  # dielectric constant of solid neon
+    eps = 1.244 * eps0             
     hbar = 1.0545718e-34
     me = 9.10938356e-31
     e = 1.602e-19
@@ -45,35 +45,34 @@ def main():
     R, Z = np.meshgrid(r, z, indexing="ij") 
 
     #-----------------------------------------------------------------------
-    # Point charge potential Vq
+    # Quadrupole potential Vq
     #-----------------------------------------------------------------------
-    two_over = 2.0 / (1.0 + eps / eps0)
-    denom = 4.0 * np.pi * eps0
+    qq = 2e-10          # meters 
+    Q  = e * qq**2      # quadrupole moment scale (C·m^2)
+
+    eta = 2.0 / (eps + 1.0)   # dielectric transmission factor 
 
     Vq = np.empty_like(R)
 
     mask_inside = (Z <= 0.0)
     mask_outside = ~mask_inside
 
+    # Pauli barrie
     Vq[mask_inside] = 0.7 * e
-    Vq[mask_outside] = -e**2 * two_over / (
-        denom * np.sqrt((Z[mask_outside] + d)**2 + R[mask_outside]**2)
-    )
 
-    #-----------------------------------------------------------------------
-    # Dipole potential Vd 
-    #-----------------------------------------------------------------------
-    dd = 3e-10
-    p = e * dd
-    Vd = np.empty_like(R)
+    # Quadrupole potential in vacuum
+    rho2 = R[mask_outside]**2 + (Z[mask_outside] + d)**2
 
-    mask_inside_d = (Z <= 0.0)
-    mask_outside_d = ~mask_inside_d
+    # regularization to avoid r=0 singularity
+    rho2 = np.maximum(rho2, (1e-12)**2)
 
-    Vd[mask_inside_d] = 0.7 * e
-    Vd[mask_outside_d] = -e * p * (Z[mask_outside_d] + d) / (
-        4.0 * np.pi * eps0 * ((Z[mask_outside_d] + d)**2 + R[mask_outside_d]**2)**(1.5)
-    )
+    numerator = 2.0*(Z[mask_outside] + d)**2 - R[mask_outside]**2
+
+    phiQ = Q * numerator / (8.0 * np.pi * eps0 * rho2**(2.5))   # Volts
+
+    # Electron potential energy (J)
+    Vq[mask_outside] = (-e) * eta * phiQ
+
 
     #-----------------------------------------------------------------------
     # Image charge potential Vim
@@ -108,14 +107,19 @@ def main():
         for n, En in enumerate(E):
             all_states.append((En, m, n))
         
-        print(f"m={m}: E0={E[0]*1000:.1f} meV, E1={E[1]*1000:.1f} meV, E2={E[2]*1000:.1f} meV")
+        
+    print(f"m={m}: E0={E[0]*1e6:.1f} μeV, E1={E[1]*1e6:.1f} μeV, E2={E[2]*1e6:.1f} μeV")
     
     # Sort all states by energy 
     all_states_sorted = sorted(all_states)
     
     print(f"\nGlobal energy spectrum (first 6 states):")
     for i, (En, m, n) in enumerate(all_states_sorted[:6]):
-        print(f"State {i}: E = {En*1000:.1f} meV (m={m}, n={n})")
+        print(f"State {i}: E = {En*1e6:.1f} μeV (m={m}, n={n})")
+    
+    # Energy separation between ground and first excited (μeV)
+    E01_separation = (all_states_sorted[1][0] - all_states_sorted[0][0]) * 1e6  # Convert eV to μeV
+    print(f"\nE01 separation: {E01_separation:.1f} μeV")
     
     Egs[k] = all_states_sorted[0][0]  # Ground state energy
     E1s[k] = all_states_sorted[1][0]  # First excited state
